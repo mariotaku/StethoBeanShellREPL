@@ -15,6 +15,10 @@ import android.support.annotation.NonNull;
 import com.facebook.stetho.inspector.console.RuntimeRepl;
 import com.facebook.stetho.inspector.console.RuntimeReplFactory;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import bsh.EvalError;
 import bsh.Interpreter;
 
@@ -24,7 +28,7 @@ public class BshRuntimeReplFactoryBuilder {
      * Android application context.
      */
     private final Context mContext;
-
+    private final Map<String, Object> mVariables;
 
     public static RuntimeReplFactory defaultFactory(@NonNull Context context) {
         return new BshRuntimeReplFactoryBuilder(context).build();
@@ -32,6 +36,7 @@ public class BshRuntimeReplFactoryBuilder {
 
     public BshRuntimeReplFactoryBuilder(@NonNull Context context) {
         mContext = context;
+        mVariables = new LinkedHashMap<>();
     }
 
     /**
@@ -46,10 +51,21 @@ public class BshRuntimeReplFactoryBuilder {
         };
     }
 
+    public void set(@NonNull String name, Object value) {
+        mVariables.put(name, value);
+    }
+
+    public void unset(@NonNull String name) {
+        mVariables.remove(name);
+    }
+
     @NonNull
     private Interpreter initInterpretor() {
         Interpreter interpreter = new Interpreter();
         try {
+            for (Entry<String, Object> entry : mVariables.entrySet()) {
+                interpreter.set(entry.getKey(), entry.getValue());
+            }
             interpreter.set("context", mContext);
             interpreter.set("application", mContext.getApplicationContext());
         } catch (EvalError evalError) {
