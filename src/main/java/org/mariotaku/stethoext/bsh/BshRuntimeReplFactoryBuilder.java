@@ -51,12 +51,14 @@ public class BshRuntimeReplFactoryBuilder {
         };
     }
 
-    public void set(@NonNull String name, Object value) {
+    public BshRuntimeReplFactoryBuilder set(@NonNull String name, Object value) {
         mVariables.put(name, value);
+        return this;
     }
 
-    public void unset(@NonNull String name) {
+    public BshRuntimeReplFactoryBuilder unset(@NonNull String name) {
         mVariables.remove(name);
+        return this;
     }
 
     @NonNull
